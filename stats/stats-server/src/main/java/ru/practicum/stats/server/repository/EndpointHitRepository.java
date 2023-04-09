@@ -16,7 +16,8 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
             "FROM EndpointHit AS e " +
             "WHERE :uris IS NULL OR e.uri IN :uris " +
             "AND e.timestamp BETWEEN :start AND :end " +
-            "GROUP BY e.app, (e.uri)")
+            "GROUP BY e.app, (e.uri) " +
+            "ORDER BY COUNT(e.ip) DESC")
     List<ViewStats> getAllViews(LocalDateTime start, LocalDateTime end, List<String> uris);
 
     @Query("SELECT e.uri AS uri, e.app AS app, COUNT(DISTINCT e.ip) AS hits " +
