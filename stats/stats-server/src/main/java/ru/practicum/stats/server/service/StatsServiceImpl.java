@@ -36,7 +36,7 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        List<ViewStatsDto> resultList;
+        List<ViewStatsDto> resultList;  // итоговый список посещений
 
         if (unique) {
             resultList = repository.getUniqueViews(start, end, uris).stream()
