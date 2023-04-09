@@ -1,0 +1,3 @@
+DELETE FROM endpoint_hits CASCADE;
+
+ALTER TABLE endpoint_hits ALTER COLUMN id RESTART WITH 1;
