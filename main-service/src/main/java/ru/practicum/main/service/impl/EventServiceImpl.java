@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.practicum.main.dto.*;
 import ru.practicum.main.exception.IncorrectEventException;
@@ -44,7 +45,7 @@ public class EventServiceImpl implements EventService {
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
-    public List<EventShortDto> getEvents(Long userId, int from, int size) {
+    public List<EventShortDto> getEvents(Long userId, Integer from, Integer size) {
         getUser(userId);
         Pageable page = PageRequest.of(from, size);
         List<EventShortDto> eventList = eventRepository.findByInitiatorId(userId, page).stream()
@@ -57,7 +58,6 @@ public class EventServiceImpl implements EventService {
     private User getUser(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id=" + id + " was not found."));
-
     }
 
     @Override
@@ -268,7 +268,7 @@ public class EventServiceImpl implements EventService {
             end = LocalDateTime.parse(rangeEnd, dateTimeFormatter);
         }
 
-        List<Event> events = eventRepository.findByAndInitiator(users, states, categories, start, end, page);
+        List<Event> events = eventRepository.findByAdmin(users, states, categories, start, end, page);
         List<EventFullDto> result = events.stream()
                 .map(eventMapper::eventToEventFullDto).collect(Collectors.toList());
 
@@ -347,31 +347,23 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getEventsByPublic(String text, List<Long> categoriesId, Boolean paid, String rangeStart,
-                                                 String rangeEnd, Boolean onlyAvailable, String sort, int from,
-                                                 int size, HttpServletRequest request) {
+                                                 String rangeEnd, Boolean onlyAvailable, String sort, Integer from,
+                                                 Integer size, HttpServletRequest request) {
         Pageable page = PageRequest.of(from, size);
 
-
-        eventRepository.findEvents(text, categoriesId, paid,
-                EventState.PUBLISHED.toString(), page);
-
-
-        List<EventShortDto> events = eventRepository.findEvents(text, categoriesId, paid,
-                        EventState.PUBLISHED.toString(), page).stream()
+        List<EventShortDto> events = eventRepository.findByPublic(text, categoriesId, paid, EventState.PUBLISHED.name(),
+                        page).stream()
                 .filter(event -> rangeStart != null ?
                         event.getEventDate().isAfter(LocalDateTime.parse(rangeStart, dateTimeFormatter)) :
                         event.getEventDate().isAfter(LocalDateTime.now())
                                 && rangeEnd != null ? event.getEventDate().isBefore(LocalDateTime.parse(rangeEnd,
-                                dateTimeFormatter)) :
-                                event.getEventDate().isBefore(LocalDateTime.MAX))
+                                dateTimeFormatter)) : event.getEventDate().isBefore(LocalDateTime.MAX))
                 .map(eventMapper::eventToEventShortDto).collect(Collectors.toList());
 
-        if (onlyAvailable) {
-            events = events.stream().filter(shortEventDto ->
-                    eventRepository.findById(shortEventDto.getId()).isPresent() &&
-                    shortEventDto.getConfirmedRequests() < eventRepository.findById(shortEventDto.getId()).get()
-                            .getParticipantLimit() || eventRepository.findById(shortEventDto.getId()).get()
-                            .getParticipantLimit() == 0).collect(Collectors.toList());
+        if (onlyAvailable.equals(true)) {
+            events = events.stream().filter(shortEventDto -> shortEventDto.getConfirmedRequests() < eventRepository
+                    .findById(shortEventDto.getId()).get().getParticipantLimit() || eventRepository
+                    .findById(shortEventDto.getId()).get().getParticipantLimit() == 0).collect(Collectors.toList());
         }
 
         if (sort != null) {
@@ -384,13 +376,29 @@ public class EventServiceImpl implements EventService {
                     events = events.stream().sorted(Comparator.comparing(EventShortDto::getViews))
                             .collect(Collectors.toList());
                     break;
+                default:
+                    throw new IncorrectEventException("Некорректный вариант сортировки в запросе");
             }
         }
 
-        log.debug("Получен список запросов с учетом фильтров");
+        List<EventShortDto> result = events.stream().peek(shortEventDto -> getViews(shortEventDto.getId()))
+                .peek(shortEventDto -> shortEventDto.setViews(getViews(shortEventDto.getId())))
+                .collect(Collectors.toList());
         statsClient.createHit(request);
-        System.out.println(request.getRequestURI());
-        return events;
+
+        log.debug("Получен список запросов с учетом фильтров");
+        return result;
+    }
+
+    private Long getViews(long eventId) {
+        ResponseEntity<Object> responseEntity = statsClient.getStats(LocalDateTime.MIN.toString(),
+                LocalDateTime.now().toString(), List.of("/events/" + eventId),false);
+
+        if (Objects.equals(responseEntity.getBody(), "")) {
+            return ((Map<String, Long>) responseEntity.getBody()).get("hits");
+        } else {
+            return 0L;
+        }
     }
 
     @Override
@@ -402,9 +410,10 @@ public class EventServiceImpl implements EventService {
         }
 
         EventFullDto eventFullDto = eventMapper.eventToEventFullDto(event);
+        eventFullDto.setViews(getViews(eventId));
+        statsClient.createHit(request);
 
         log.debug("Получен объект события {}", event);
-        statsClient.createHit(request);
         return eventFullDto;
     }
 }

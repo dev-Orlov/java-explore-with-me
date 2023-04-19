@@ -7,7 +7,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 public interface EventService {
-    List<EventShortDto> getEvents(Long userId, int from, int size);
+    List<EventShortDto> getEvents(Long userId, Integer from, Integer size);
 
     @Transactional
     EventFullDto create(Long userId, NewEventDto eventNewDto);
@@ -28,8 +28,8 @@ public interface EventService {
     EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequestDto updateEvent);
 
     List<EventShortDto> getEventsByPublic(String text, List<Long> categoriesId, Boolean paid, String rangeStart,
-                                          String rangeEnd, Boolean onlyAvailable, String sort, int from,
-                                          int size, HttpServletRequest request);
+                                          String rangeEnd, Boolean onlyAvailable, String sort, Integer from,
+                                          Integer size, HttpServletRequest request);
 
     EventFullDto getEventByPublic(Long eventId, HttpServletRequest request);
 }

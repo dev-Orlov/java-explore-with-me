@@ -24,17 +24,17 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                     "AND (?3 IS NULL OR e.category_id IN ?3) " +
                     "AND (e.event_date >= ?4) " +
                     "AND (e.event_date <= ?5) ")
-    List<Event> findByAndInitiator(List<Long> users, List<String> state, List<Long> categories,
+    List<Event> findByAdmin(List<Long> users, List<String> state, List<Long> categories,
                                          LocalDateTime rangeStart, LocalDateTime rangeEnd, Pageable page);
 
     @Query(nativeQuery = true,
             value = "SELECT * FROM events AS e " +
-                    "WHERE (?1 IS NULL OR (LOWER(e.annotation) LIKE LOWER(CONCAT('%', ?1, '%')) " +
-                    "OR LOWER(e.description) LIKE LOWER(CONCAT('%', ?1, '%')))) " +
+                    "WHERE (?1 IS NULL OR ((LOWER(e.annotation) LIKE LOWER(concat('%', ?1, '%'))) " +
+                    "OR (LOWER(e.description) LIKE LOWER(concat('%', ?1, '%'))))) " +
                     "AND (?2 IS NULL OR e.category_id IN ?2) " +
                     "AND (?3 IS NULL OR e.paid = ?3) " +
-                    "AND (e.state = ?4) ")
-    Page<Event> findEvents(String text, List<Long> categoriesId, Boolean paid, String state, Pageable page);
+                    "AND (?4 IS NULL OR e.state = ?4) ")
+    Page<Event> findByPublic(String text, List<Long> categoriesId, Boolean paid, String state, Pageable page);
 
     List<Event> findByCategoryId(Long categoryId);
 }

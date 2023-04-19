@@ -33,6 +33,9 @@ public class PublicEventController {
                                                                      int from,
                                                                  @Positive @RequestParam(defaultValue = "10") int size,
                                                                  HttpServletRequest request) {
+        if (categoriesId == null) {
+            categoriesId = List.of();
+        }
         return ResponseEntity.ok().body(eventService.getEventsByPublic(text, categoriesId, paid, rangeStart, rangeEnd,
                 onlyAvailable, sort, from, size, request));
     }
