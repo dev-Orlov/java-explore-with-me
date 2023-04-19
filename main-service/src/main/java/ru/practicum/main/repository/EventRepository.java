@@ -28,12 +28,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                          LocalDateTime rangeStart, LocalDateTime rangeEnd, Pageable page);
 
     @Query(nativeQuery = true,
-            value = " SELECT * FROM events AS e " +
-                    "WHERE (LOWER(e.annotation) LIKE LOWER(CONCAT('%', ?1, '%')) " +
-                    "OR LOWER(e.description) LIKE LOWER(CONCAT('%', ?1, '%'))) " +
-                    "AND e.category_id IN ?2 " +
-                    "AND e.paid = ?3 " +
-                    "AND e.state = ?4 ")
+            value = "SELECT * FROM events AS e " +
+                    "WHERE (?1 IS NULL OR (LOWER(e.annotation) LIKE LOWER(CONCAT('%', ?1, '%')) " +
+                    "OR LOWER(e.description) LIKE LOWER(CONCAT('%', ?1, '%')))) " +
+                    "AND (?2 IS NULL OR e.category_id IN ?2) " +
+                    "AND (?3 IS NULL OR e.paid = ?3) " +
+                    "AND (e.state = ?4) ")
     Page<Event> findEvents(String text, List<Long> categoriesId, Boolean paid, String state, Pageable page);
 
     List<Event> findByCategoryId(Long categoryId);

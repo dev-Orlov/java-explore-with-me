@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.practicum.main.dto.*;
 import ru.practicum.main.exception.IncorrectEventException;
@@ -352,6 +351,11 @@ public class EventServiceImpl implements EventService {
                                                  int size, HttpServletRequest request) {
         Pageable page = PageRequest.of(from, size);
 
+
+        eventRepository.findEvents(text, categoriesId, paid,
+                EventState.PUBLISHED.toString(), page);
+
+
         List<EventShortDto> events = eventRepository.findEvents(text, categoriesId, paid,
                         EventState.PUBLISHED.toString(), page).stream()
                 .filter(event -> rangeStart != null ?
@@ -385,19 +389,8 @@ public class EventServiceImpl implements EventService {
 
         log.debug("Получен список запросов с учетом фильтров");
         statsClient.createHit(request);
+        System.out.println(request.getRequestURI());
         return events;
-    }
-
-    private Long getViews(Long id) {
-        ResponseEntity<Object> responseEntity = statsClient.getStats(
-                LocalDateTime.of(2020, 9, 1, 0, 0).toString(),
-                LocalDateTime.now().toString(),
-                List.of("/events/" + id),false);
-
-        if (Objects.equals(responseEntity.getBody(), "")) {
-            return ((Map<String, Long>) responseEntity.getBody()).get("hits");
-        }
-        return 0L;
     }
 
     @Override

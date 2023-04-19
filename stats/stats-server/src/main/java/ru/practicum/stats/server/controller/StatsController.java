@@ -31,6 +31,6 @@ public class StatsController {
                                        @DateTimeFormat(pattern = dateTimeFormat) LocalDateTime end,
                                        @RequestParam(required = false) List<String> uris,
                                        @RequestParam(defaultValue = "false") boolean unique) {
-        return new ResponseEntity<>(statsService.getStats(start, end, uris, unique), HttpStatus.CREATED);
+        return ResponseEntity.ok().body(statsService.getStats(start, end, uris, unique));
     }
 }
