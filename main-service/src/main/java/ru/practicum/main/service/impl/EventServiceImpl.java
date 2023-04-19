@@ -72,14 +72,16 @@ public class EventServiceImpl implements EventService {
                     ("Время события не может быть раньше, чем через два часа от текущего момента");
         }
 
+        LocalDateTime createdTime = LocalDateTime.now().withNano(0);
+        event.setCreateOn(createdTime);
         event.setInitiator(user);
-        event.setCreateOn(LocalDateTime.now());
         event.setState(EventState.PENDING);
         eventRepository.save(event);
 
         EventFullDto eventFullDto= eventMapper.eventToEventFullDto(event);
         eventFullDto.setLocation(new EventLocation(newEventDto.getLocation().getLat(),
                 newEventDto.getLocation().getLon()));
+        eventFullDto.setCreatedOn(createdTime.format(dateTimeFormatter));
 
         log.debug("Сохранён объект события {}", event);
         return eventFullDto;
@@ -298,9 +300,13 @@ public class EventServiceImpl implements EventService {
             event.setAnnotation(updateEvent.getAnnotation());
         }
 
-        if (updateEvent.getCategory() != null) {
+        /*if (updateEvent.getCategory() != null) {
             event.setCategory(categoryMapper.categoryDtoToCategory(updateEvent.getCategory()));
-        }
+        }*/
+
+        /*if (categoryRepository.findById(updateEvent.getCategory()).isPresent()) {
+            event.setCategory(categoryRepository.findById(updateEvent.getCategory()).get());
+        }*/
 
         if (updateEvent.getDescription() != null) {
             event.setDescription(updateEvent.getDescription());
@@ -385,13 +391,6 @@ public class EventServiceImpl implements EventService {
             }
         }
 
-        /*List<EventShortDto> resultList = events
-                .stream()
-                .peek(shortEventDto -> getViews(shortEventDto.getId()))
-                .peek(shortEventDto -> shortEventDto.setViews(getViews(shortEventDto.getId())))
-                .collect(Collectors.toList());*/
-
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         log.debug("Получен список запросов с учетом фильтров");
         statsClient.createHit(request);
         return events;
@@ -418,8 +417,6 @@ public class EventServiceImpl implements EventService {
         }
 
         EventFullDto eventFullDto = eventMapper.eventToEventFullDto(event);
-        getViews(eventId);
-        eventFullDto.setViews(getViews(eventId));
 
         log.debug("Получен объект события {}", event);
         statsClient.createHit(request);

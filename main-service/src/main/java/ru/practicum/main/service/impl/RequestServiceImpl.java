@@ -79,6 +79,11 @@ public class RequestServiceImpl implements RequestService {
             throw new IncorrectRequestException("Запрос не создан из-за ограничения на количество участников");
         }
 
+        if (!event.getRequestModeration()) {
+            status = ParticipationRequestStatus.CONFIRMED;
+        }
+        request.setStatus(status);
+
         requestRepository.save(request);
         ParticipationRequestDto result = requestMapper.participationRequestToParticipationRequestDto(request);
         result.setCreated(createdTime.toString());

@@ -10,7 +10,7 @@ public class UpdateEventAdminRequestDto {
 
     private String title;
     private String annotation;
-    private CategoryDto category;
+    private Long category;
     private String description;
     private String eventDate;
     private EventLocation location;

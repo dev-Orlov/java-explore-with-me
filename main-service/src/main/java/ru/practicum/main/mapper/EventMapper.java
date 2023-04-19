@@ -9,6 +9,8 @@ import ru.practicum.main.dto.NewEventDto;
 import ru.practicum.main.model.event.Event;
 import ru.practicum.main.repository.CategoryRepository;
 
+import java.time.format.DateTimeFormatter;
+
 @Mapper(componentModel = "spring")
 public abstract class EventMapper {
 
@@ -18,11 +20,12 @@ public abstract class EventMapper {
     protected CategoryMapper categoryMapper;
     @Autowired
     protected CategoryRepository categoryRepository;
+    protected static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Mapping(target = "category",
             expression = "java(categoryMapper.categoryToCategoryDto(event.getCategory()))")
     @Mapping(target = "eventDate",
-            expression = "java(event.getEventDate().toString())")
+            expression = "java(event.getEventDate().format(dateTimeFormatter))")
     @Mapping(target = "initiator",
             expression = "java(userMapper.userToUserShortDto(event.getInitiator()))")
     public abstract EventShortDto eventToEventShortDto(Event event);
@@ -37,7 +40,7 @@ public abstract class EventMapper {
     @Mapping(target = "createdOn",
             expression = "java(event.getCreateOn().toString())")
     @Mapping(target = "eventDate",
-            expression = "java(event.getEventDate().toString())")
+            expression = "java(event.getEventDate().format(dateTimeFormatter))")
     @Mapping(target = "initiator",
             expression = "java(userMapper.userToUserShortDto(event.getInitiator()))")
     public abstract EventFullDto eventToEventFullDto(Event event);
