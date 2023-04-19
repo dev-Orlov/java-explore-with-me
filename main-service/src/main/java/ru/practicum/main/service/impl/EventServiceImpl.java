@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class EventServiceImpl implements EventService {
+public class EventServiceImpl implements EventService {    //проверить импорты
 
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
