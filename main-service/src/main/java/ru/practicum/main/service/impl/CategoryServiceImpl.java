@@ -49,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDto remove(Long categoryId) {
+    public CategoryDto delete(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundException("Category with id=" + categoryId + " was not found."));
         CategoryDto categoryDto = categoryMapper.categoryToCategoryDto(category);

@@ -12,7 +12,7 @@ public interface CategoryService {
     CategoryDto create(NewCategoryDto newCategoryDto);
 
     @Transactional
-    CategoryDto remove(Long categoryId);
+    CategoryDto delete(Long categoryId);
 
     @Transactional
     CategoryDto update(CategoryDto categoryDto, Long categoryId);

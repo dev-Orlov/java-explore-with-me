@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.stats.dto.EndpointHitDto;
 import ru.practicum.stats.dto.ViewStatsDto;
-import ru.practicum.stats.server.model.ViewStats;
 import ru.practicum.stats.server.service.StatsService;
 
 import java.time.LocalDateTime;

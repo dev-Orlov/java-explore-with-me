@@ -33,7 +33,8 @@ public class AdminUserController {
     }
 
     @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long userId) {
-        ResponseEntity.ok().body(userService.delete(userId));
+        userService.delete(userId);
     }
 }
