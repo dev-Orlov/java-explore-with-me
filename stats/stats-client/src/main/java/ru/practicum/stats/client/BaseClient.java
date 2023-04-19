@@ -3,7 +3,7 @@ package ru.practicum.stats.client;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
+import org.springframework.lang.NonNull;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -44,7 +44,7 @@ public class BaseClient {
         return responseBuilder.build();
     }
 
-    protected ResponseEntity<Object> get(@Nullable Map<String, Object> parameters) {
+    protected ResponseEntity<Object> get(@NonNull Map<String, Object> parameters) {
         return makeAndSendRequest(HttpMethod.GET, "/stats?start={start}&end={end}&uris={uris}&unique={unique}",
                 parameters);
     }
