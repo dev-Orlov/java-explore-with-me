@@ -14,8 +14,7 @@ public interface EventService {
 
     EventFullDto getEventByOwner(Long userId, Long eventId);
 
-    EventFullDto updateEventByOwner(Long userId, Long eventId,
-                                    UpdateEventUserRequest UpdateEventUserRequestDto);
+    EventFullDto updateEventByOwner(Long userId, Long eventId, UpdateEventUserRequestDto updateEventUserRequestDto);
 
     List<ParticipationRequestDto> getEventRequestsByOwner(Long userId, Long eventId);
 

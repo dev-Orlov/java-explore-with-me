@@ -6,7 +6,7 @@ import ru.practicum.main.model.event.EventLocation;
 
 @Data
 @AllArgsConstructor
-public class UpdateEventUserRequest {
+public class UpdateEventUserRequestDto {
 
     private String title;
     private String annotation;

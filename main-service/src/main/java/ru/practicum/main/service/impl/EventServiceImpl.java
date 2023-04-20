@@ -99,7 +99,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto updateEventByOwner(Long userId, Long eventId,
-                                           UpdateEventUserRequest updateEventUserRequestDto) {
+                                           UpdateEventUserRequestDto updateEventUserRequestDto) {
         getUser(userId);
         Event event = getEvent(eventId);
         checkOwner(event, userId);
