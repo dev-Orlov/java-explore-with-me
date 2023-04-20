@@ -67,8 +67,8 @@ public class EventServiceImpl implements EventService {
         Event event = eventMapper.newEventDtoToEvent(newEventDto);
 
         if (LocalDateTime.now().plusHours(2).isAfter(event.getEventDate())) {
-            throw new IncorrectEventException
-                    ("Время события не может быть раньше, чем через два часа от текущего момента");
+            throw new IncorrectEventException("Время события не может быть раньше," +
+                    " чем через два часа от текущего момента");
         }
 
         LocalDateTime createdTime = LocalDateTime.now().withNano(0);
@@ -77,7 +77,7 @@ public class EventServiceImpl implements EventService {
         event.setState(EventState.PENDING);
         eventRepository.save(event);
 
-        EventFullDto eventFullDto= eventMapper.eventToEventFullDto(event);
+        EventFullDto eventFullDto = eventMapper.eventToEventFullDto(event);
         eventFullDto.setLocation(new EventLocation(newEventDto.getLocation().getLat(),
                 newEventDto.getLocation().getLon()));
         eventFullDto.setCreatedOn(createdTime.format(dateTimeFormatter));
@@ -99,19 +99,19 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto updateEventByOwner(Long userId, Long eventId,
-                                           UpdateEventUserRequestDto updateEventUserRequestDto) {
+                                           UpdateEventUserRequest updateEventUserRequestDto) {
         getUser(userId);
         Event event = getEvent(eventId);
         checkOwner(event, userId);
 
         if (event.getState().equals(EventState.PUBLISHED)) {
-            throw new IncorrectEventException
-                    ("Изменить можно только отмененные события или события в состоянии ожидания модерации");
+            throw new IncorrectEventException("Изменить можно только отмененные события " +
+                    "или события в состоянии ожидания модерации");
         }
 
         if (LocalDateTime.now().plusHours(2).isAfter(event.getEventDate())) {
-            throw new IncorrectEventException
-                    ("Время события не может быть раньше, чем через два часа от текущего момента");
+            throw new IncorrectEventException("Время события не может быть раньше," +
+                    " чем через два часа от текущего момента");
         }
 
         if (updateEventUserRequestDto.getTitle() != null) {
@@ -133,8 +133,8 @@ public class EventServiceImpl implements EventService {
         if (updateEventUserRequestDto.getEventDate() != null) {
             event.setEventDate(LocalDateTime.parse(updateEventUserRequestDto.getEventDate(), dateTimeFormatter));
             if (event.getEventDate().isBefore(LocalDateTime.now().minusHours(1))) {
-                throw new IncorrectEventException
-                        ("Дата начала изменяемого события должна быть не ранее чем за час от даты публикации");
+                throw new IncorrectEventException("Дата начала изменяемого события должна быть не ранее " +
+                        "чем за час от даты публикации");
             }
         }
 
@@ -212,8 +212,8 @@ public class EventServiceImpl implements EventService {
 
         for (ParticipationRequest request : foundRequests) {
             if (!request.getStatus().equals(ParticipationRequestStatus.PENDING)) {
-                throw new IncorrectRequestException
-                        ("Статус можно изменить только у заявок, находящихся в состоянии ожидания");
+                throw new IncorrectRequestException("Статус можно изменить только у заявок, " +
+                        "находящихся в состоянии ожидания");
             }
         }
 
@@ -282,8 +282,8 @@ public class EventServiceImpl implements EventService {
 
         if (!event.getState().equals(EventState.PENDING) && updateEvent.getStateAction()
                 .equals(StateAction.PUBLISH_EVENT)) {
-            throw new IncorrectEventException
-                    ("Событие можно публиковать, только если оно в состоянии ожидания публикации");
+            throw new IncorrectEventException("Событие можно публиковать," +
+                    " только если оно в состоянии ожидания публикации");
         }
 
         if (event.getState().equals(EventState.PUBLISHED) && updateEvent.getStateAction()
@@ -306,8 +306,8 @@ public class EventServiceImpl implements EventService {
         if (updateEvent.getEventDate() != null) {
             event.setEventDate(LocalDateTime.parse(updateEvent.getEventDate(), dateTimeFormatter));
             if (event.getEventDate().isBefore(LocalDateTime.now().minusHours(1))) {
-                throw new IncorrectEventException
-                        ("Дата начала изменяемого события должна быть не ранее чем за час от даты публикации");
+                throw new IncorrectEventException("Дата начала изменяемого события должна быть не ранее " +
+                        "чем за час от даты публикации");
             }
         }
 
