@@ -269,7 +269,9 @@ public class EventServiceImpl implements EventService {
             end = LocalDateTime.parse(rangeEnd, dateTimeFormatter);
         }
 
-        List<Event> events = eventRepository.findByAdmin(users, states, categories, start, end, page);
+        List<EventState> stringStates = states.stream().map(EventState::valueOf).collect(Collectors.toList());
+
+        List<Event> events = eventRepository.findByAdmin(users, stringStates, categories, start, end, page);
         List<EventFullDto> result = events.stream()
                 .map(eventMapper::eventToEventFullDto).collect(Collectors.toList());
 
@@ -352,7 +354,7 @@ public class EventServiceImpl implements EventService {
                                                  Integer size, HttpServletRequest request) {
         Pageable page = PageRequest.of(from, size);
 
-        List<EventShortDto> events = eventRepository.findByPublic(text, categoriesId, paid, EventState.PUBLISHED.name(),
+        List<EventShortDto> events = eventRepository.findByPublic(text, categoriesId, paid, EventState.PUBLISHED,
                         page).stream()
                 .filter(event -> rangeStart != null ?
                         event.getEventDate().isAfter(LocalDateTime.parse(rangeStart, dateTimeFormatter)) :

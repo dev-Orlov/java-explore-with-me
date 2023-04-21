@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    @Query(nativeQuery = true, value = "SELECT * FROM categories AS c WHERE c.name = ?1 ")
+    @Query("SELECT c FROM Category c WHERE c.name = (:name)")
     Optional<Category> findByName(String name);
 
 }
