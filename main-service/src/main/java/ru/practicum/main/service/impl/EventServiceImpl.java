@@ -11,12 +11,14 @@ import ru.practicum.main.exception.IncorrectEventException;
 import ru.practicum.main.exception.IncorrectRequestException;
 import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.mapper.CategoryMapper;
+import ru.practicum.main.mapper.CommentMapper;
 import ru.practicum.main.mapper.EventMapper;
 import ru.practicum.main.mapper.RequestMapper;
 import ru.practicum.main.model.User;
 import ru.practicum.main.model.event.*;
 import ru.practicum.main.model.request.ParticipationRequest;
 import ru.practicum.main.model.request.ParticipationRequestStatus;
+import ru.practicum.main.repository.CommentRepository;
 import ru.practicum.main.repository.EventRepository;
 import ru.practicum.main.repository.RequestRepository;
 import ru.practicum.main.repository.UserRepository;
@@ -43,6 +45,9 @@ public class EventServiceImpl implements EventService {
     private final CategoryMapper categoryMapper;
     private final RequestMapper requestMapper;
     private final StatsClient statsClient;
+    private final CommentRepository commentRepository;
+
+    private final CommentMapper commentMapper;
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
@@ -94,8 +99,16 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId);
         checkOwner(event, userId);
 
+        EventFullDto result = eventMapper.eventToEventFullDto(event);
+        result.setComments(getComments(eventId));
+
         log.debug("Получен объект события {}", event);
-        return eventMapper.eventToEventFullDto(event);
+        return result;
+    }
+
+    private List<CommentDto> getComments(Long id) {
+        return commentRepository.findAllByEventId(id).stream()
+                .map(commentMapper::commentToCommentDto).collect(Collectors.toList());
     }
 
     @Override
@@ -164,8 +177,11 @@ public class EventServiceImpl implements EventService {
 
         event = eventRepository.save(event);
 
+        EventFullDto result = eventMapper.eventToEventFullDto(event);
+        result.setComments(getComments(eventId));
+
         log.debug("Обновлён объект события: {}", event);
-        return eventMapper.eventToEventFullDto(event);
+        return result;
     }
 
     private Event getEvent(Long id) {
@@ -274,6 +290,9 @@ public class EventServiceImpl implements EventService {
         List<Event> events = eventRepository.findByAdmin(users, stringStates, categories, start, end, page);
         List<EventFullDto> result = events.stream()
                 .map(eventMapper::eventToEventFullDto).collect(Collectors.toList());
+        for (EventFullDto findEvent : result) {
+            findEvent.setComments(getComments(findEvent.getId()));
+        }
 
         log.debug("Получена подборка событий от имени администратора");
         return result;
@@ -344,8 +363,11 @@ public class EventServiceImpl implements EventService {
 
         event = eventRepository.save(event);
 
+        EventFullDto result = eventMapper.eventToEventFullDto(event);
+        result.setComments(getComments(eventId));
+
         log.debug("Обновлён объект события: {}", event);
-        return eventMapper.eventToEventFullDto(event);
+        return result;
     }
 
     @Override
@@ -415,6 +437,7 @@ public class EventServiceImpl implements EventService {
         EventFullDto eventFullDto = eventMapper.eventToEventFullDto(event);
         eventFullDto.setViews(getViews(eventId));
         statsClient.createHit(request);
+        eventFullDto.setComments(getComments(eventId));
 
         log.debug("Получен объект события {}", event);
         return eventFullDto;

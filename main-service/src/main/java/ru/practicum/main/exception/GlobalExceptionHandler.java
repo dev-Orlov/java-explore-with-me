@@ -23,7 +23,8 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler({AlreadyExistsException.class, IncorrectRequestException.class, IncorrectEventException.class})
+    @ExceptionHandler({AlreadyExistsException.class, IncorrectRequestException.class, IncorrectEventException.class,
+            IncorrectCommentException.class})
     public ResponseEntity<ApiError> handleConflict(RuntimeException e) {
         log.error(e.getMessage(), e);
         ApiError apiError = new ApiError(List.of(e.getClass().getName()), e.getMessage(),
