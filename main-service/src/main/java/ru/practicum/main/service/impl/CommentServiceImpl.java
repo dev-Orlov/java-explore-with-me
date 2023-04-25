@@ -129,4 +129,14 @@ public class CommentServiceImpl implements CommentService {
         log.debug("Получен комментарий с id={}", commentId);
         return commentMapper.commentToCommentDto(comment);
     }
+
+    @Override
+    public List<CommentDto> getCommentsForEvent(Long eventId) {
+        getEvent(eventId);
+        List<Comment> eventComments = commentRepository.findAllByEventId(eventId);
+
+        log.debug("Получен список комментариев для события с id={}", eventId);
+        return eventComments.stream().map(commentMapper::commentToCommentDto)
+                .collect(Collectors.toList());
+    }
 }

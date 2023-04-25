@@ -917,11 +917,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/comments?from=0&size=100",
+					"raw": "{{baseUrl}}/admin/comments?from=0&size=100",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
+						"admin",
 						"comments"
 					],
 					"query": [
@@ -1299,7 +1300,7 @@
 			"response": []
 		},
 		{
-			"name": "Comments get all after delete comment 1",
+			"name": "Comments get all for event 39 after delete comment 1",
 			"event": [
 				{
 					"listen": "test",
@@ -1345,7 +1346,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/comments?from=0&size=100",
+					"raw": "{{baseUrl}}/comments?eventId=39",
 					"host": [
 						"{{baseUrl}}"
 					],
@@ -1354,12 +1355,8 @@
 					],
 					"query": [
 						{
-							"key": "from",
-							"value": "0"
-						},
-						{
-							"key": "size",
-							"value": "100"
+							"key": "eventId",
+							"value": "39"
 						}
 					]
 				}
