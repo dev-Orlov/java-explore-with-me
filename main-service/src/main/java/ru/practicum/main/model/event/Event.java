@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.main.model.Category;
+import ru.practicum.main.model.Comment;
 import ru.practicum.main.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -46,4 +48,8 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventState state;
     private Long views;
+    @ManyToMany
+    @JoinTable(name = "event_comment", joinColumns = {@JoinColumn(name = "comment_id")},
+            inverseJoinColumns = {@JoinColumn(name = "event_id")})
+    List<Comment> comments;
 }

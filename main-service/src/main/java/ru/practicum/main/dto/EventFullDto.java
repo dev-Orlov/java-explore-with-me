@@ -7,6 +7,7 @@ import ru.practicum.main.model.event.EventState;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -35,4 +36,5 @@ public class EventFullDto {
     private Boolean requestModeration;
     private EventState state;
     private Long views;
+    private List<CommentDto> comments;
 }
